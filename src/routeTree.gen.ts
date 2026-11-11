@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BookmapRouteImport } from './routes/bookmap'
 import { Route as DeskRouteImport } from './routes/desk'
+import { Route as HawkesRouteImport } from './routes/hawkes'
 import { Route as IcebergsRouteImport } from './routes/icebergs'
 import { Route as LeadlagRouteImport } from './routes/leadlag'
 import { Route as SnifferRouteImport } from './routes/sniffer'
@@ -30,6 +31,11 @@ const BookmapRoute = BookmapRouteImport.update({
 const DeskRoute = DeskRouteImport.update({
   id: '/desk',
   path: '/desk',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HawkesRoute = HawkesRouteImport.update({
+  id: '/hawkes',
+  path: '/hawkes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IcebergsRoute = IcebergsRouteImport.update({
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/bookmap': typeof BookmapRoute
   '/desk': typeof DeskRoute
+  '/hawkes': typeof HawkesRoute
   '/icebergs': typeof IcebergsRoute
   '/leadlag': typeof LeadlagRoute
   '/sniffer': typeof SnifferRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/bookmap': typeof BookmapRoute
   '/desk': typeof DeskRoute
+  '/hawkes': typeof HawkesRoute
   '/icebergs': typeof IcebergsRoute
   '/leadlag': typeof LeadlagRoute
   '/sniffer': typeof SnifferRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/bookmap': typeof BookmapRoute
   '/desk': typeof DeskRoute
+  '/hawkes': typeof HawkesRoute
   '/icebergs': typeof IcebergsRoute
   '/leadlag': typeof LeadlagRoute
   '/sniffer': typeof SnifferRoute
@@ -84,15 +93,30 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/bookmap' | '/desk' | '/icebergs' | '/leadlag' | '/sniffer' | '/tape'
+    | '/'
+    | '/bookmap'
+    | '/desk'
+    | '/hawkes'
+    | '/icebergs'
+    | '/leadlag'
+    | '/sniffer'
+    | '/tape'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/bookmap' | '/desk' | '/icebergs' | '/leadlag' | '/sniffer' | '/tape'
+    | '/'
+    | '/bookmap'
+    | '/desk'
+    | '/hawkes'
+    | '/icebergs'
+    | '/leadlag'
+    | '/sniffer'
+    | '/tape'
   id:
     | '__root__'
     | '/'
     | '/bookmap'
     | '/desk'
+    | '/hawkes'
     | '/icebergs'
     | '/leadlag'
     | '/sniffer'
@@ -103,6 +127,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BookmapRoute: typeof BookmapRoute
   DeskRoute: typeof DeskRoute
+  HawkesRoute: typeof HawkesRoute
   IcebergsRoute: typeof IcebergsRoute
   LeadlagRoute: typeof LeadlagRoute
   SnifferRoute: typeof SnifferRoute
@@ -130,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/desk'
       fullPath: '/desk'
       preLoaderRoute: typeof DeskRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hawkes': {
+      id: '/hawkes'
+      path: '/hawkes'
+      fullPath: '/hawkes'
+      preLoaderRoute: typeof HawkesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/icebergs': {
@@ -167,6 +199,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BookmapRoute: BookmapRoute,
   DeskRoute: DeskRoute,
+  HawkesRoute: HawkesRoute,
   IcebergsRoute: IcebergsRoute,
   LeadlagRoute: LeadlagRoute,
   SnifferRoute: SnifferRoute,
