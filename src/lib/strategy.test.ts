@@ -49,3 +49,31 @@ describe("strategy rules", () => {
     expect(s.position).toBeNull();
   });
 });
+
+describe("hawkes 10k mode", () => {
+  const k = (time: number, o: number, h: number, l: number, c: number, v: number) => ({ time, open: o, high: h, low: l, close: c, volume: v, buyVolume: v / 2 });
+  const warm = (e: ReturnType<typeof createEngine>, vol = 10) => { for (let i = 0; i < 20; i++) onCandleClose(e, k(i * 60, 85000, 85100, 84900, 85000, vol)); };
+
+  it("fades a 10k touch when flow is organic (n < 0.4)", () => {
+    const e = createEngine("hawkes"); warm(e);
+    onCandleClose(e, k(2000, 90100, 90200, 90050, 90080, 10));
+    expect(e.branching).toBeLessThan(0.4);
+    expect(e.position?.side).toBe("long");
+  });
+
+  it("trades the breakout when the branching ratio reaches 0.85", () => {
+    const e = createEngine("hawkes"); warm(e, 1);
+    onCandleClose(e, k(2000, 90100, 90150, 89800, 89900, 400));
+    expect(e.branching).toBeGreaterThanOrEqual(0.85);
+    expect(e.position?.side).toBe("short");
+  });
+
+  it("skips the touch in the excited band (0.4 to 0.85)", () => {
+    const e = createEngine("hawkes"); warm(e, 10);
+    onCandleClose(e, k(1990, 85000, 85100, 84900, 85000, 30));
+    onCandleClose(e, k(2000, 90100, 90200, 90050, 90080, 30));
+    expect(e.branching).toBeGreaterThanOrEqual(0.4);
+    expect(e.branching).toBeLessThan(0.85);
+    expect(e.position).toBeNull();
+  });
+});

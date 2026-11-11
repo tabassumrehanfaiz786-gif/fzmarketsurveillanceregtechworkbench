@@ -7,7 +7,7 @@ vi.mock("@tanstack/react-start", () => ({ useServerFn: () => mocks.sync }));
 vi.mock("@/lib/coach.functions", () => ({ syncPaperTrades: vi.fn() }));
 vi.mock("sonner", () => ({ toast: { error: vi.fn() } }));
 const trade: Trade = { id: 1, side: "long", level: 80000, entry: 80200, exit: 82700, entryTime: 100, exitTime: 200, pnl: 1200, reason: "RUNNER" };
-const engines = () => { const sweep = createEngine("sweep"); sweep.trades.push(trade); return { sweep, touch: createEngine("touch") }; };
+const engines = () => { const sweep = createEngine("sweep"); sweep.trades.push(trade); return { sweep, touch: createEngine("touch"), hawkes: createEngine("hawkes") }; };
 beforeEach(() => { vi.clearAllMocks(); mocks.sync.mockResolvedValue({ saved: 1 }); });
 it("does not save signed-out trades", () => {
   renderHook(() => useTradeSync(engines(), "15m", null));
