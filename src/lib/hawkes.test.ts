@@ -42,7 +42,7 @@ describe("hawkes", () => {
 
   it("Hurst ≈ 0.5 for a random walk", () => {
     const r = rng(3); const p = [100];
-    for (let i = 0; i < 4000; i++) p.push(p[i] * Math.exp((r() - 0.5) * 0.002));
+    for (let i = 0; i < 4000; i++) p.push(p[i]! * Math.exp((r() - 0.5) * 0.002));
     expect(hurstExponent(p)!).toBeGreaterThan(0.4);
     expect(hurstExponent(p)!).toBeLessThan(0.6);
   });

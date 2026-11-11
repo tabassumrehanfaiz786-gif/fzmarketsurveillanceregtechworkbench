@@ -36,7 +36,7 @@ export function estimateBranching(events: number[], start: number, end: number, 
   const counts = new Array<number>(bins).fill(0);
   for (const t of events) {
     const i = Math.floor((t - start) / binSec);
-    if (i >= 0 && i < bins) counts[i]++;
+    if (i >= 0 && i < bins) counts[i] = (counts[i] ?? 0) + 1;
   }
   const mean = counts.reduce((a, b) => a + b, 0) / bins;
   if (mean <= 0) return 0;
@@ -62,7 +62,7 @@ export function pushEvent(events: number[], t: number, cfg: HawkesConfig = DEFAU
   events.push(t);
   const cutoff = t - cfg.windowSec;
   let drop = 0;
-  while (drop < events.length && events[drop] < cutoff) drop++;
+  while (drop < events.length && (events[drop] ?? Infinity) < cutoff) drop++;
   if (drop) events.splice(0, drop);
   if (events.length > cfg.maxEvents) events.splice(0, events.length - cfg.maxEvents);
   return events;
@@ -78,7 +78,7 @@ export function hurstExponent(prices: number[], lags: number[] = [1, 2, 4, 8, 16
   for (const k of lags) {
     if (x.length <= k + 2) continue;
     const d: number[] = [];
-    for (let i = k; i < x.length; i++) d.push(x[i] - x[i - k]);
+    for (let i = k; i < x.length; i++) d.push(x[i]! - x[i - k]!);
     const m = d.reduce((a, b) => a + b, 0) / d.length;
     const v = d.reduce((a, b) => a + (b - m) ** 2, 0) / d.length;
     if (v > 0) pts.push([Math.log(k), Math.log(v)]);
