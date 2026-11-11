@@ -12,6 +12,7 @@ import { stats, unrealized, nearestLevel, type EngineState, type Mode } from "@/
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useOrderBook } from "@/hooks/use-order-book";
+import { HawkesRadar } from "@/components/terminal/hawkes-radar";
 import { LiquidityHeatmap } from "@/components/terminal/liquidity-heatmap";
 
 export const Route = createFileRoute("/")({
@@ -98,6 +99,8 @@ function Terminal() {
         {error && <div role="alert" className="mt-2 flex items-center justify-between gap-2 text-down"><span>{error}</span><Button variant="outline" size="sm" onClick={retry}>Retry</Button></div>}
         {!error && feed === "down" && <div className="mt-2 flex items-center justify-between gap-2 text-down"><span>Live feed disconnected · values may be stale.</span><Button variant="outline" size="sm" onClick={retry}>Reconnect</Button></div>}
       </section>
+
+      <HawkesRadar />
 
       <div className="grid grid-cols-3 gap-1 sm:gap-2 lg:grid-cols-6">
         <Stat label="Equity" value={usd(equity)} />
