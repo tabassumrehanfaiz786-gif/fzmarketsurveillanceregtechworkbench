@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { createEngine, managePrice, onCandleClose, type Candle, type EngineState } from "@/lib/strategy";
+import { createEngine, managePrice, onCandleClose, type Candle, type EngineState, type Mode } from "@/lib/strategy";
 import { CB_REST, openMatches } from "@/lib/coinbase";
 
 export type Interval = "1m" | "5m" | "15m";
@@ -18,7 +18,7 @@ export function useTerminal(interval: Interval) {
   const [attempt, setAttempt] = useState(0);
   const [historyReady, setHistoryReady] = useState(false);
   const candles = useRef<Candle[]>([]);
-  const engines = useRef<{ sweep: EngineState; touch: EngineState }>({ sweep: createEngine("sweep"), touch: createEngine("touch") });
+  const engines = useRef<Record<Mode, EngineState>>({ sweep: createEngine("sweep"), touch: createEngine("touch"), hawkes: createEngine("hawkes") });
 
   useEffect(() => {
     let ws: WebSocket | null = null;
@@ -27,7 +27,7 @@ export function useTerminal(interval: Interval) {
     let raf = 0;
     const bump = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; setTick((t) => t + 1); }); };
     candles.current = [];
-    engines.current = { sweep: createEngine("sweep"), touch: createEngine("touch") };
+    engines.current = { sweep: createEngine("sweep"), touch: createEngine("touch"), hawkes: createEngine("hawkes") };
     setFeed("connecting");
     setError(null);
     setHistoryReady(false);
@@ -51,8 +51,8 @@ export function useTerminal(interval: Interval) {
         if (cancelled) return;
         const hist = [...byTime.values()].sort((a, b) => a.time - b.time).slice(-1000);
         const closed = hist.slice(0, -1);
-        const { sweep, touch } = engines.current;
-        for (const e of [sweep, touch]) {
+        const all = Object.values(engines.current);
+        for (const e of all) {
           e.audit.push({ time: closed[0]?.time ?? 0, kind: "SYSTEM", message: `Replaying ${closed.length} ${interval} candles, balance $${e.cfg.startBalance.toLocaleString()}` });
           for (const c of closed) onCandleClose(e, c);
           e.audit.push({ time: hist.at(-1)?.time ?? 0, kind: "SYSTEM", message: "Replay complete — live paper execution armed" });
@@ -74,16 +74,16 @@ export function useTerminal(interval: Interval) {
         const t = Math.floor(m.time / 1000 / gran) * gran;
         const arr = candles.current;
         const last = arr[arr.length - 1];
-        const { sweep, touch } = engines.current;
+        const all = Object.values(engines.current);
         if (last && last.time === t) {
           last.high = Math.max(last.high, m.price); last.low = Math.min(last.low, m.price); last.close = m.price;
           last.volume += m.qty; if (m.side === "buy") last.buyVolume += m.qty;
         } else if (!last || t > last.time) {
-          if (last) for (const e of [sweep, touch]) onCandleClose(e, last);
+          if (last) for (const e of all) onCandleClose(e, last);
           arr.push({ time: t, open: m.price, high: m.price, low: m.price, close: m.price, volume: m.qty, buyVolume: m.side === "buy" ? m.qty : 0 });
           if (arr.length > 1500) arr.shift();
         }
-        for (const e of [sweep, touch]) managePrice(e, m.price, t);
+        for (const e of all) managePrice(e, m.price, t);
         bump();
       }, () => setFeed("live"), () => { if (!cancelled) setFeed("down"); });
     })();

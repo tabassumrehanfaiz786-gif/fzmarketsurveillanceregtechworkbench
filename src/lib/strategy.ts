@@ -1,5 +1,7 @@
 // Pure paper-trading engine for the BTCUSDT 10k-level strategy.
-export type Mode = "sweep" | "touch";
+export type Mode = "sweep" | "touch" | "hawkes";
+export const MODES: Mode[] = ["sweep", "touch", "hawkes"];
+export const MODE_LABEL: Record<Mode, string> = { sweep: "Sweep & Reclaim", touch: "10k Touch", hawkes: "Hawkes 10k" };
 export type Side = "long" | "short";
 
 export interface Candle {
@@ -99,12 +101,15 @@ export interface EngineState {
   cvd: number;
   ranges: number[];
   nextId: number;
+  vols: number[];
+  excite: number;
+  branching: number;
 }
 
 export function createEngine(mode: Mode, cfg: Config = DEFAULT_CONFIG): EngineState {
   return {
     mode, cfg, balance: cfg.startBalance, position: null, trades: [], audit: [],
-    equity: [], markers: [], armed: {}, cvd: 0, ranges: [], nextId: 1,
+    equity: [], markers: [], armed: {}, cvd: 0, ranges: [], nextId: 1, vols: [], excite: 0, branching: 0,
   };
 }
 
@@ -208,6 +213,7 @@ export function onCandleClose(s: EngineState, k: Candle) {
   const delta = 2 * k.buyVolume - k.volume;
   s.cvd += delta;
   const L = nearestLevel(k.close);
+  const n = updateHawkes(s, k.volume);
 
   // re-arm levels after a clean move away
   for (const key of Object.keys(s.armed)) {
@@ -226,6 +232,20 @@ export function onCandleClose(s: EngineState, k: Candle) {
     const touched = k.low <= L + c.touchBand && k.high >= L - c.touchBand;
     if (touched && s.armed[L] === false) {
       log(s, k.time, "REJECT", `${L / 1000}k touched but awaiting clean retest (re-entry control)`);
+    } else if (s.mode === "hawkes") {
+      if (touched) {
+        if (n >= 0.85) {
+          // Cascade: self-exciting flow pushes through the level — trade with the break.
+          const side: Side = k.close >= L ? "long" : "short";
+          open(s, side, L, k.close, side === "long" ? k.close - c.stopCap : k.close + c.stopCap, k.time, `Hawkes cascade breakout, n ${n.toFixed(2)}`);
+        } else if (n >= 0.4) {
+          log(s, k.time, "REJECT", `${L / 1000}k touch skipped: excited flow n ${n.toFixed(2)} (adverse selection)`);
+        } else {
+          // Organic flow: fade the level like a classic touch.
+          const side: Side = k.open >= L ? "long" : "short";
+          open(s, side, L, k.close, side === "long" ? k.close - c.stopCap : k.close + c.stopCap, k.time, `Hawkes organic touch, n ${n.toFixed(2)}`);
+        }
+      }
     } else if (s.mode === "touch") {
       if (touched) {
         const side: Side = k.open >= L ? "long" : "short";
@@ -252,6 +272,23 @@ export function onCandleClose(s: EngineState, k: Candle) {
   }
   s.equity.push({ time: k.time, value: s.balance + unrealized(s, k.close) });
   if (s.equity.length > 5000) s.equity.shift();
+}
+
+export const HAWKES_BETA = 0.5; // per candle
+export const HAWKES_WINDOW = 50;
+/**
+ * Candle-level Hawkes excitation: λ = Σ (v_i / mean v)·e^{-β·age}. Unclustered flow gives
+ * λ ≈ 1/(1-e^{-β}); excess ratio r maps to branching n = 1 - 1/r (clamped 0..0.99).
+ */
+export function updateHawkes(s: EngineState, volume: number) {
+  s.vols.push(volume);
+  if (s.vols.length > HAWKES_WINDOW) s.vols.shift();
+  const mean = s.vols.reduce((a, b) => a + b, 0) / s.vols.length;
+  s.excite = s.excite * Math.exp(-HAWKES_BETA) + (mean > 0 ? volume / mean : 0);
+  const base = 1 / (1 - Math.exp(-HAWKES_BETA));
+  const r = s.excite / base;
+  s.branching = s.vols.length < 10 || r <= 1 ? 0 : Math.min(0.99, 1 - 1 / r);
+  return s.branching;
 }
 
 export function stats(s: EngineState) {

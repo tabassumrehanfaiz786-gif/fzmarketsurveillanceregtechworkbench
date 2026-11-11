@@ -8,7 +8,7 @@ import { useTradeSync } from "@/hooks/use-trade-sync";
 import { loadAlertsMuted, saveAlertsMuted, playChime } from "@/lib/alerts";
 import { useTerminal, type Interval } from "@/hooks/use-terminal";
 import { PriceChart, EquityChart } from "@/components/terminal/charts";
-import { stats, unrealized, nearestLevel, type EngineState, type Mode } from "@/lib/strategy";
+import { stats, unrealized, nearestLevel, type EngineState, type Mode, MODES, MODE_LABEL } from "@/lib/strategy";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useOrderBook } from "@/hooks/use-order-book";
@@ -76,7 +76,7 @@ function Terminal() {
         <div className="text-muted-foreground">Nearest level <span className="text-primary">{price ? `${nearestLevel(price) / 1000}k` : "—"}</span> ({price ? usd(price - nearestLevel(price), 0) : "—"})</div>
         <div className="ml-auto flex min-w-0 flex-wrap items-center gap-2">
           <Seg value={interval} onChange={(v) => setInterval(v as Interval)} options={[["1m", "1m"], ["5m", "5m"], ["15m", "15m"]]} />
-          <Seg value={mode} onChange={(v) => setMode(v as Mode)} options={[["sweep", "Institutional Sweep & Reclaim"], ["touch", "Basic 10k Touch"]]} />
+          <Seg value={mode} onChange={(v) => setMode(v as Mode)} options={[["sweep", "Institutional Sweep & Reclaim"], ["touch", "Basic 10k Touch"], ["hawkes", "Hawkes 10k"]]} />
           <Button size="icon" variant="ghost" className="h-7 w-7" aria-label={muted ? "Enable trade sounds" : "Mute trade sounds"} title={muted ? "Enable trade sounds" : "Mute trade sounds"} onClick={() => { const next = !muted; setMuted(next); saveAlertsMuted(next); if (!next) playChime("entry"); }}>{muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}</Button>
           <Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/tape">Tape</Link></Button>
           <Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/icebergs">Icebergs</Link></Button>
@@ -88,7 +88,7 @@ function Terminal() {
 
       <section aria-label="Current paper trade" className={cn("border border-border bg-card px-3 py-2", p && "border-up/50")}>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-[11px] text-muted-foreground">PAPER · {interval} · {mode === "sweep" ? "Sweep & Reclaim" : "10k Touch"}</span>
+          <span className="text-[11px] text-muted-foreground">PAPER · {interval} · {MODE_LABEL[mode]}{mode === "hawkes" && ` · n ${e.branching.toFixed(2)}`}</span>
           <span className={cn("font-semibold", p ? tone(upnl) : "text-muted-foreground")}>{p ? `OPEN ${p.side.toUpperCase()} · ${usd(upnl)} uPnL` : !candles.length ? "Loading trade history…" : "NO OPEN POSITION"}</span>
         </div>
         {p ? <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-4">
@@ -137,7 +137,7 @@ function Terminal() {
           <Panel title="Mode comparison">
             <table className="w-full text-left">
               <thead className="text-muted-foreground"><tr><th className="px-3 py-1 font-normal">Mode</th><th>Trades</th><th>Win%</th><th className="pr-3 text-right">PnL</th></tr></thead>
-              <tbody>{(["sweep", "touch"] as Mode[]).map((m) => <CmpRow key={m} e={engines[m]} price={price} active={m === mode} />)}</tbody>
+              <tbody>{MODES.map((m) => <CmpRow key={m} e={engines[m]} price={price} active={m === mode} />)}</tbody>
             </table>
           </Panel>
           <div id="coach-workspace" className="flex min-h-[320px] min-w-0 flex-col">
@@ -202,7 +202,7 @@ function CmpRow({ e, price, active }: { e: EngineState; price: number; active: b
   const total = e.balance + unrealized(e, price) - e.cfg.startBalance;
   return (
     <tr className={cn("border-t border-border/50", active && "bg-secondary")}>
-      <td className="px-3 py-1">{e.mode === "sweep" ? "Sweep & Reclaim" : "10k Touch"}</td><td>{s.trades}</td><td>{s.winRate.toFixed(0)}%</td>
+      <td className="px-3 py-1">{MODE_LABEL[e.mode]}</td><td>{s.trades}</td><td>{s.winRate.toFixed(0)}%</td>
       <td className={cn("pr-3 text-right", tone(total))}>{usd(total, 0)}</td>
     </tr>
   );
