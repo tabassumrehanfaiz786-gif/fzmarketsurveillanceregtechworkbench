@@ -1,0 +1,22 @@
+<!-- LOVABLE:BEGIN -->
+> [!IMPORTANT]
+> This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
+> published git history — force pushing, or rebasing/amending/squashing commits
+> that are already pushed — as it rewrites history on Lovable's side and the
+> user will likely lose their project history.
+>
+> Commits you push to the connected branch sync back to Lovable and show up in
+> the editor, so keep the branch in a working state.
+<!-- LOVABLE:END -->
+
+- Trading strategy rules live in the pure engine src/lib/strategy.ts (covered by strategy.test.ts); UI and the Binance feed hook only call into it, so rules stay testable.
+- Order-book synchronization, snapshots, and wall detection live in the pure src/lib/order-book.ts module with unit tests; the independent depth hook never changes trading decisions.
+- Resting-liquidity history is a bounded browser-session timeline built only from synchronized live Binance spot snapshots; reconnects leave unsampled gaps rather than inventing historical liquidity.
+- Chart initialization triggers a React update after the dynamic import resolves so existing candles and equity render without waiting for a market tick.
+- The top trade summary reads the selected engine only; never invent a position or present replay results as persisted execution records.
+- The AI coach analyzes authenticated saved paper simulations on demand and never changes strategy parameters; reports disclose replay data and retain user risk constraints.
+- Trade alerts baseline the audit after history is ready and track event identity, while cloud sync serializes batches per engine/account to survive resets without overlapping saves.
+- Dual Bookmap uses independent browser-only synchronized Spot and USD-M depth streams; pure bookmap helpers enforce futures sequence continuity and keep observed depth, executions, and liquidation histories bounded without affecting strategy decisions.
+- Iceberg visualization uses bounded observed session samples and the existing pure detector; display helpers deduplicate heavy-absorption alerts, and all hidden-order levels remain estimates rather than participant identification.
+- Cross-venue lead-lag radar uses browser-only Binance Spot/Perp and Coinbase ticker feeds sampled on a shared clock; pure src/lib/leadlag.ts does basis, lag correlation and fee-aware paper arb, never sending orders.
+- Hidden-order sniffer (/sniffer) uses pure src/lib/sniffer.ts on live public prints; results are estimates and never touch strategy decisions.
