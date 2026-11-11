@@ -115,7 +115,7 @@ function HawkesPage() {
   );
 }
 
-function Stat({ k, v, sub, cls }: { k: string; v: string; sub?: string; cls?: string }) {
+function Stat({ k, v, sub, cls }: { k: string; v: string; sub?: string | undefined; cls?: string | undefined }) {
   return <div className="border border-border bg-card p-2"><div className="text-[10px] uppercase text-muted-foreground">{k}</div><div className={cn("text-sm font-semibold tabular-nums", cls)}>{v}</div>{sub && <div className="text-[10px] text-muted-foreground">{sub}</div>}</div>;
 }
 function Row({ k, v }: { k: string; v: string }) {
