@@ -25,3 +25,4 @@
 - [ ] Run detector and display-logic tests and verify live desktop/mobile views.
 # OTC & stealth desk
 - [x] Pure desk engine with tests, /desk page with sweep vs RFQ vs iceberg slicer and LIS card.
+- Hawkes 10k strategy mode (done)

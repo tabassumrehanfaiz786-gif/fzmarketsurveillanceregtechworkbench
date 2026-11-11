@@ -19,7 +19,7 @@ export function useTradeSync(engines: Record<Mode, EngineState>, interval: Inter
   useEffect(() => {
     if (account.current !== userId) { cursor.current = {}; account.current = userId; setStatus("idle"); }
     if (!userId) return;
-    for (const mode of ["sweep", "touch"] as Mode[]) {
+    for (const mode of ["sweep", "touch", "hawkes"] as Mode[]) {
       const e = engines[mode];
       const key = `${mode}-${interval}`;
       let record = cursor.current[key];

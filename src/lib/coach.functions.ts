@@ -5,7 +5,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { generateCoachReport } from "./server/ai-coach.server";
 
 const tradeSchema = z.object({
-  mode: z.enum(["sweep", "touch"]),
+  mode: z.enum(["sweep", "touch", "hawkes"]),
   timeframe: z.string(),
   side: z.enum(["long", "short"]),
   level: z.number(),
@@ -59,7 +59,7 @@ The strategy trades bounces at $10,000 BTC levels (60k, 70k, 80k...). Current ru
 - $50,000 position per trade, structure stop capped at $2,500 from entry
 - Stop moves to break-even after +$2,500; TP1 takes 50% off at +$2,500; runner targets the next 10k level
 - No re-entry while a position is open; a level must be left by $1,000 (clean retest) before re-arming
-- Two modes: "sweep" (institutional sweep & reclaim with CVD absorption and ATR regime filter, max ATR $1,200) and "touch" (basic 10k touch)
+- Two modes: "sweep" (institutional sweep & reclaim with CVD absorption and ATR regime filter, max ATR $1,200) "touch" (basic 10k touch) and "hawkes" (10k touch gated by candle-volume Hawkes branching ratio: fade when organic n<0.4, skip when excited, trade the breakout when n≥0.85)
 
 Write a concise markdown report with these sections:
 ## Verdict — 2-3 sentences on overall performance
