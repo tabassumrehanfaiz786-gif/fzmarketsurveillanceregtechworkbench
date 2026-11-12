@@ -17,8 +17,8 @@ describe("strategy rules", () => {
   it("moves stop to break-even after +$2,500 and runs to next 10k", () => {
     const s = createEngine("touch");
     onCandleClose(s, k(70100, 70120, 69990, 70000));
-    managePrice(s, 72500, 2);
-    expect(s.position!.stop).toBe(70000);
+    managePrice(s, 72501, 2);
+    expect(s.position!.stop).toBe(s.position!.entry);
     expect(s.position!.qty).toBeCloseTo(s.position!.initialQty / 2);
     expect(s.position!.target).toBe(80000);
   });
@@ -75,5 +75,15 @@ describe("hawkes 10k mode", () => {
     expect(e.branching).toBeGreaterThanOrEqual(0.4);
     expect(e.branching).toBeLessThan(0.85);
     expect(e.position).toBeNull();
+  });
+});
+
+import { entrySlippage as _slip, DEFAULT_CONFIG as _cfg } from "./strategy";
+describe("execution slippage", () => {
+  it("pays only half spread when n <= 0.40", () => {
+    expect(_slip(_cfg, 1000, 0.3)).toBe(0.5);
+  });
+  it("adds ATR-scaled adverse selection above n = 0.40", () => {
+    expect(_slip(_cfg, 1000, 0.9)).toBeCloseTo(0.5 + 1000 * 0.5 * 0.05);
   });
 });

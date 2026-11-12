@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useOrderBook } from "@/hooks/use-order-book";
 import { HawkesRadar } from "@/components/terminal/hawkes-radar";
+import { VpinGauge } from "@/components/terminal/vpin-gauge";
 import { LiquidityHeatmap } from "@/components/terminal/liquidity-heatmap";
 
 export const Route = createFileRoute("/")({
@@ -80,7 +81,7 @@ function Terminal() {
           <Button size="icon" variant="ghost" className="h-7 w-7" aria-label={muted ? "Enable trade sounds" : "Mute trade sounds"} title={muted ? "Enable trade sounds" : "Mute trade sounds"} onClick={() => { const next = !muted; setMuted(next); saveAlertsMuted(next); if (!next) playChime("entry"); }}>{muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}</Button>
           <Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/tape">Tape</Link></Button>
           <Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/icebergs">Icebergs</Link></Button>
-          <Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/bookmap">Bookmap</Link></Button><Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/desk">OTC Desk</Link></Button><Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/leadlag">Lead-Lag</Link></Button><Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/sniffer">Sniffer</Link></Button><Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/hawkes">Hawkes</Link></Button>
+          <Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/bookmap">Bookmap</Link></Button><Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/desk">OTC Desk</Link></Button><Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/leadlag">Lead-Lag</Link></Button><Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/sniffer">Sniffer</Link></Button><Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/hawkes">Hawkes</Link></Button><Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/compliance">Regulation</Link></Button>
           <Button size="sm" variant="outline" className="h-7 gap-1.5 text-[11px]" onClick={() => { setWorkspace("coach"); document.getElementById("coach-workspace")?.scrollIntoView({ behavior: "smooth", block: "center" }); }}><Brain className="h-3.5 w-3.5" />AI Coach</Button>
           <AccountControls user={user} />
         </div>
@@ -101,6 +102,7 @@ function Terminal() {
       </section>
 
       <HawkesRadar />
+      <VpinGauge />
 
       <div className="grid grid-cols-3 gap-1 sm:gap-2 lg:grid-cols-6">
         <Stat label="Equity" value={usd(equity)} />

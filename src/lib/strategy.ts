@@ -27,6 +27,10 @@ export interface Config {
   rearmDistance: number;
   regimeAtrMax: number;
   feeRate: number;
+  /** Half bid-ask spread paid on entry (USD). */
+  halfSpread: number;
+  /** ATR multiplier for adverse-selection slippage when branching n > 0.40. */
+  impactFactor: number;
   stopReverse: boolean;
 }
 
@@ -43,6 +47,8 @@ export const DEFAULT_CONFIG: Config = {
   rearmDistance: 1_000,
   regimeAtrMax: 1_200,
   feeRate: 0.0004,
+  halfSpread: 0.5,
+  impactFactor: 0.05,
   stopReverse: true,
 };
 
@@ -60,6 +66,8 @@ export interface Position {
   beMoved: boolean;
   realized: number;
   flip?: boolean;
+  theoreticalEntry?: number;
+  slippageUsd?: number | undefined;
 }
 
 export interface Trade {
@@ -72,6 +80,8 @@ export interface Trade {
   exitTime: number;
   pnl: number;
   reason: string;
+  theoreticalPrice?: number | undefined;
+  slippageUsd?: number | undefined;
 }
 
 export type AuditKind = "ENTRY" | "EXIT" | "PARTIAL" | "RISK" | "REJECT" | "REARM" | "SYSTEM";
@@ -139,6 +149,7 @@ function closeQty(s: EngineState, qty: number, price: number, time: number, reas
     s.trades.push({
       id: s.nextId++, side: p.side, level: p.level, entry: p.entry, exit: price,
       entryTime: p.entryTime, exitTime: time, pnl: p.realized, reason,
+      theoreticalPrice: p.theoreticalEntry, slippageUsd: p.slippageUsd,
     });
     s.markers.push({ time, kind: "exit", text: `${reason} ${p.realized >= 0 ? "+" : ""}${p.realized.toFixed(0)}`, price });
     log(s, time, "EXIT", `${p.side.toUpperCase()} closed @ ${price.toFixed(1)} (${reason}) PnL ${p.realized.toFixed(2)}`);
@@ -184,8 +195,15 @@ function atr(s: EngineState) {
   return s.ranges.reduce((a, b) => a + b, 0) / s.ranges.length;
 }
 
-function open(s: EngineState, side: Side, level: number, entry: number, structureStop: number, time: number, why: string) {
+/** Adverse slippage per BTC: half spread + ATR × (n − 0.40)⁺ × impact. Pure. */
+export function entrySlippage(cfg: Config, atrValue: number, branching: number): number {
+  return cfg.halfSpread + atrValue * Math.max(0, branching - 0.4) * cfg.impactFactor;
+}
+
+function open(s: EngineState, side: Side, level: number, theoretical: number, structureStop: number, time: number, why: string) {
   const c = s.cfg;
+  const slip = entrySlippage(c, atr(s), s.branching ?? 0);
+  const entry = side === "long" ? theoretical + slip : theoretical - slip;
   const capped = side === "long" ? Math.max(structureStop, entry - c.stopCap) : Math.min(structureStop, entry + c.stopCap);
   const qty = c.positionUsd / entry;
   s.balance -= entry * qty * c.feeRate;
@@ -195,6 +213,7 @@ function open(s: EngineState, side: Side, level: number, entry: number, structur
     // Runner anchors to the next macro 10k strike from the traded level, not from the entry price.
     target: side === "long" ? level + 10_000 : level - 10_000,
     tp1Hit: false, beMoved: false, realized: -entry * qty * c.feeRate,
+    theoreticalEntry: theoretical, slippageUsd: slip * qty,
   };
   s.armed[level] = false;
   s.markers.push({ time, kind: side === "long" ? "entry-long" : "entry-short", text: `${side === "long" ? "BUY" : "SELL"} ${level / 1000}k`, price: entry });

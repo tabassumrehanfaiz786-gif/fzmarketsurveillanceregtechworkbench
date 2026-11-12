@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BookmapRouteImport } from './routes/bookmap'
+import { Route as ComplianceRouteImport } from './routes/compliance'
 import { Route as DeskRouteImport } from './routes/desk'
 import { Route as HawkesRouteImport } from './routes/hawkes'
 import { Route as IcebergsRouteImport } from './routes/icebergs'
@@ -26,6 +27,11 @@ const IndexRoute = IndexRouteImport.update({
 const BookmapRoute = BookmapRouteImport.update({
   id: '/bookmap',
   path: '/bookmap',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComplianceRoute = ComplianceRouteImport.update({
+  id: '/compliance',
+  path: '/compliance',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeskRoute = DeskRouteImport.update({
@@ -62,6 +68,7 @@ const TapeRoute = TapeRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/bookmap': typeof BookmapRoute
+  '/compliance': typeof ComplianceRoute
   '/desk': typeof DeskRoute
   '/hawkes': typeof HawkesRoute
   '/icebergs': typeof IcebergsRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/bookmap': typeof BookmapRoute
+  '/compliance': typeof ComplianceRoute
   '/desk': typeof DeskRoute
   '/hawkes': typeof HawkesRoute
   '/icebergs': typeof IcebergsRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/bookmap': typeof BookmapRoute
+  '/compliance': typeof ComplianceRoute
   '/desk': typeof DeskRoute
   '/hawkes': typeof HawkesRoute
   '/icebergs': typeof IcebergsRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/bookmap'
+    | '/compliance'
     | '/desk'
     | '/hawkes'
     | '/icebergs'
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/bookmap'
+    | '/compliance'
     | '/desk'
     | '/hawkes'
     | '/icebergs'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/bookmap'
+    | '/compliance'
     | '/desk'
     | '/hawkes'
     | '/icebergs'
@@ -126,6 +138,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BookmapRoute: typeof BookmapRoute
+  ComplianceRoute: typeof ComplianceRoute
   DeskRoute: typeof DeskRoute
   HawkesRoute: typeof HawkesRoute
   IcebergsRoute: typeof IcebergsRoute
@@ -148,6 +161,13 @@ declare module '@tanstack/react-router' {
       path: '/bookmap'
       fullPath: '/bookmap'
       preLoaderRoute: typeof BookmapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compliance': {
+      id: '/compliance'
+      path: '/compliance'
+      fullPath: '/compliance'
+      preLoaderRoute: typeof ComplianceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/desk': {
@@ -198,6 +218,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BookmapRoute: BookmapRoute,
+  ComplianceRoute: ComplianceRoute,
   DeskRoute: DeskRoute,
   HawkesRoute: HawkesRoute,
   IcebergsRoute: IcebergsRoute,

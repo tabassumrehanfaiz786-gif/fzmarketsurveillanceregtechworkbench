@@ -53,7 +53,7 @@ export const getCoachReports = createServerFn({ method: "GET" })
     return { reports: data ?? [] };
   });
 
-const SYSTEM = `You are the built-in AI trade coach of FZ Quant Terminal, a BTCUSDT paper-trading app. You analyze the user's saved paper trades and tell them exactly what to fix to win more.
+const SYSTEM = `You are the built-in AI trade coach of FZ Quant Terminal, a BTCUSDT paper-trading app. You analyze the user's saved paper trades and tell them exactly what to fix to win more. Entries include modeled execution friction (half spread plus adverse-selection slippage scaled by the Hawkes branching ratio); when relevant, comment on slippage drag versus expectancy and on trading into toxic (high-VPIN) or cascade (n ≥ 0.85) flow.
 
 The strategy trades bounces at $10,000 BTC levels (60k, 70k, 80k...). Current rules:
 - $50,000 position per trade, structure stop capped at $2,500 from entry

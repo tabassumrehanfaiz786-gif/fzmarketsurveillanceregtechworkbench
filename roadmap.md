@@ -26,3 +26,4 @@
 # OTC & stealth desk
 - [x] Pure desk engine with tests, /desk page with sweep vs RFQ vs iceberg slicer and LIS card.
 - Hawkes 10k strategy mode (done)
+- [x] VPIN, entry slippage model, GPT-6.1 Terra coach, /compliance regulatory mapping

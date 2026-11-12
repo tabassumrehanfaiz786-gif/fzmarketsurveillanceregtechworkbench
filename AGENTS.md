@@ -21,3 +21,4 @@
 - Cross-venue lead-lag radar uses browser-only Binance Spot/Perp and Coinbase ticker feeds sampled on a shared clock; pure src/lib/leadlag.ts does basis, lag correlation and fee-aware paper arb, never sending orders.
 - Hidden-order sniffer (/sniffer) uses pure src/lib/sniffer.ts on live public prints; results are estimates and never touch strategy decisions.
 - Hawkes cascade radar (/): pure src/lib/hawkes.ts estimates branching ratio from live Coinbase prints; display-only, never touches strategy decisions.
+- VPIN gauge uses pure src/lib/vpin.ts on live Coinbase prints (display-only); strategy entries pay pure entrySlippage (half spread + ATR·(n−0.4)⁺·impact) recorded on trades.

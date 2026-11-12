@@ -4,7 +4,7 @@ import { streamText } from "ai";
 import { createLovableAiGatewayRunIdFetch, getLovableAiGatewayRunId } from "./run-id.ts";
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1";
-const MODEL = "openai/gpt-6-astra";
+const MODEL = "openai/gpt-6.1-terra";
 
 export async function generateCoachReport(request: Request, system: string, userPrompt: string): Promise<string> {
   const apiKey = process.env["LOVABLE_API_KEY"];
@@ -25,7 +25,7 @@ export async function generateCoachReport(request: Request, system: string, user
       openai: {
         store: false,
         forceReasoning: true,
-        reasoningEffort: "medium",
+        reasoningEffort: "high",
         reasoningSummary: "auto",
         include: ["reasoning.encrypted_content"],
       },
