@@ -20,6 +20,7 @@ import { Route as LeadlagRouteImport } from './routes/leadlag'
 import { Route as SnifferRouteImport } from './routes/sniffer'
 import { Route as StorRouteImport } from './routes/stor'
 import { Route as TapeRouteImport } from './routes/tape'
+import { Route as ApiPublicSurveillanceTickRouteImport } from './routes/api/public/surveillance-tick'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -76,6 +77,12 @@ const TapeRoute = TapeRouteImport.update({
   path: '/tape',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSurveillanceTickRoute =
+  ApiPublicSurveillanceTickRouteImport.update({
+    id: '/api/public/surveillance-tick',
+    path: '/api/public/surveillance-tick',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/sniffer': typeof SnifferRoute
   '/stor': typeof StorRoute
   '/tape': typeof TapeRoute
+  '/api/public/surveillance-tick': typeof ApiPublicSurveillanceTickRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -102,6 +110,7 @@ export interface FileRoutesByTo {
   '/sniffer': typeof SnifferRoute
   '/stor': typeof StorRoute
   '/tape': typeof TapeRoute
+  '/api/public/surveillance-tick': typeof ApiPublicSurveillanceTickRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,6 +125,7 @@ export interface FileRoutesById {
   '/sniffer': typeof SnifferRoute
   '/stor': typeof StorRoute
   '/tape': typeof TapeRoute
+  '/api/public/surveillance-tick': typeof ApiPublicSurveillanceTickRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/sniffer'
     | '/stor'
     | '/tape'
+    | '/api/public/surveillance-tick'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +155,7 @@ export interface FileRouteTypes {
     | '/sniffer'
     | '/stor'
     | '/tape'
+    | '/api/public/surveillance-tick'
   id:
     | '__root__'
     | '/'
@@ -157,6 +169,7 @@ export interface FileRouteTypes {
     | '/sniffer'
     | '/stor'
     | '/tape'
+    | '/api/public/surveillance-tick'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -171,6 +184,7 @@ export interface RootRouteChildren {
   SnifferRoute: typeof SnifferRoute
   StorRoute: typeof StorRoute
   TapeRoute: typeof TapeRoute
+  ApiPublicSurveillanceTickRoute: typeof ApiPublicSurveillanceTickRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -252,6 +266,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TapeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/surveillance-tick': {
+      id: '/api/public/surveillance-tick'
+      path: '/api/public/surveillance-tick'
+      fullPath: '/api/public/surveillance-tick'
+      preLoaderRoute: typeof ApiPublicSurveillanceTickRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -267,6 +288,7 @@ const rootRouteChildren: RootRouteChildren = {
   SnifferRoute: SnifferRoute,
   StorRoute: StorRoute,
   TapeRoute: TapeRoute,
+  ApiPublicSurveillanceTickRoute: ApiPublicSurveillanceTickRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

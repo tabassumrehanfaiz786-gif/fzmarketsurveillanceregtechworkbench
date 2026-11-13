@@ -1,5 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { queryOptions, useQuery } from "@tanstack/react-query";
+import { listSavedIncidents } from "@/lib/incidents.functions";
+import { downloadStorPdf } from "@/lib/stor-pdf";
 import { Button } from "@/components/ui/button";
 import { useSurveillance } from "@/hooks/use-surveillance";
 import { IncidentRegistry } from "@/components/terminal/incident-registry";
@@ -24,7 +27,10 @@ function download(d: StorDraft) {
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `${d.ref}.json`; a.click(); URL.revokeObjectURL(a.href);
 }
 
+const savedQuery = queryOptions({ queryKey: ["saved-incidents"], queryFn: () => listSavedIncidents(), refetchInterval: 60_000 });
+
 function StorPage() {
+  const saved = useQuery(savedQuery);
   const s = useSurveillance();
   const [draft, setDraft] = useState<StorDraft | null>(null);
   return (
@@ -42,6 +48,21 @@ function StorPage() {
         </div>
         <Button onClick={() => setDraft(buildStor({ snifferScore: null, vpin: s.vpin, branching: s.branching }, new Date()))}>Draft STOR from current signals</Button>
         <IncidentRegistry log={s.log} max={20} onDraft={(i) => setDraft(buildStor(i.signals, new Date(i.t)))} />
+        <section aria-label="Permanent incident record" className="border border-border bg-card">
+          <div className="border-b border-border px-3 py-1.5 text-[11px] text-muted-foreground">PERMANENT RECORD · checked every minute in the background, even when this page is closed</div>
+          {saved.data?.error ? <p className="p-3 text-xs text-down">{saved.data.error}</p> : !saved.data ? <p className="p-3 text-xs text-muted-foreground">Loading…</p> : saved.data.incidents.length === 0 ? <p className="p-3 text-xs text-muted-foreground">No incidents recorded yet.</p> : (
+            <ul className="max-h-72 divide-y divide-border overflow-auto">
+              {saved.data.incidents.map((i) => (
+                <li key={i.id} className="flex flex-wrap items-center gap-2 px-3 py-1.5 text-xs">
+                  <span className="tabular-nums text-muted-foreground">{i.detected_at.slice(0, 19).replace("T", " ")}</span>
+                  <span className="font-semibold text-primary">{i.suspicion}</span>
+                  <span className="text-muted-foreground">{i.reasons.join(" · ")}</span>
+                  <button type="button" className="ml-auto underline" onClick={() => void downloadStorPdf(buildStor({ snifferScore: null, vpin: i.vpin, branching: i.branching }, new Date(i.detected_at)))}>PDF</button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
         {draft && (
           <section className="space-y-2 border border-primary/50 bg-card p-3 text-xs">
             <h2 className="text-sm font-semibold text-primary">{draft.ref}</h2>
@@ -53,7 +74,7 @@ function StorPage() {
               <dt className="text-muted-foreground">Statutory basis</dt><dd>UK MAR Art 12 (manipulation), Art 14 (insider dealing), Art 16(2) (STOR duty); FCA SUP 15.10</dd>
             </dl>
             <p>{draft.narrative}</p>
-            <div className="flex gap-2"><Button size="sm" variant="outline" onClick={() => download(draft)}>Download JSON</Button><Button size="sm" variant="outline" onClick={() => window.print()}>Print</Button></div>
+            <div className="flex gap-2"><Button size="sm" onClick={() => void downloadStorPdf(draft)}>Download PDF</Button><Button size="sm" variant="outline" onClick={() => download(draft)}>Download JSON</Button><Button size="sm" variant="outline" onClick={() => window.print()}>Print</Button></div>
           </section>
         )}
       </div>

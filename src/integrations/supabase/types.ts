@@ -86,6 +86,48 @@ export type Database = {
         }
         Relationships: []
       }
+      surveillance_incidents: {
+        Row: {
+          branching: number | null
+          created_at: string
+          detected_at: string
+          id: string
+          instrument: string
+          reasons: string[]
+          score: number
+          source: string
+          suspicion: string
+          venue: string
+          vpin: number | null
+        }
+        Insert: {
+          branching?: number | null
+          created_at?: string
+          detected_at?: string
+          id: string
+          instrument?: string
+          reasons?: string[]
+          score: number
+          source?: string
+          suspicion: string
+          venue?: string
+          vpin?: number | null
+        }
+        Update: {
+          branching?: number | null
+          created_at?: string
+          detected_at?: string
+          id?: string
+          instrument?: string
+          reasons?: string[]
+          score?: number
+          source?: string
+          suspicion?: string
+          venue?: string
+          vpin?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
