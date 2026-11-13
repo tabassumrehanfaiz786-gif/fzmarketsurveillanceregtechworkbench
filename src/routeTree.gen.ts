@@ -15,8 +15,10 @@ import { Route as ComplianceRouteImport } from './routes/compliance'
 import { Route as DeskRouteImport } from './routes/desk'
 import { Route as HawkesRouteImport } from './routes/hawkes'
 import { Route as IcebergsRouteImport } from './routes/icebergs'
+import { Route as KillswitchRouteImport } from './routes/killswitch'
 import { Route as LeadlagRouteImport } from './routes/leadlag'
 import { Route as SnifferRouteImport } from './routes/sniffer'
+import { Route as StorRouteImport } from './routes/stor'
 import { Route as TapeRouteImport } from './routes/tape'
 
 const IndexRoute = IndexRouteImport.update({
@@ -49,6 +51,11 @@ const IcebergsRoute = IcebergsRouteImport.update({
   path: '/icebergs',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KillswitchRoute = KillswitchRouteImport.update({
+  id: '/killswitch',
+  path: '/killswitch',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LeadlagRoute = LeadlagRouteImport.update({
   id: '/leadlag',
   path: '/leadlag',
@@ -57,6 +64,11 @@ const LeadlagRoute = LeadlagRouteImport.update({
 const SnifferRoute = SnifferRouteImport.update({
   id: '/sniffer',
   path: '/sniffer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StorRoute = StorRouteImport.update({
+  id: '/stor',
+  path: '/stor',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TapeRoute = TapeRouteImport.update({
@@ -72,8 +84,10 @@ export interface FileRoutesByFullPath {
   '/desk': typeof DeskRoute
   '/hawkes': typeof HawkesRoute
   '/icebergs': typeof IcebergsRoute
+  '/killswitch': typeof KillswitchRoute
   '/leadlag': typeof LeadlagRoute
   '/sniffer': typeof SnifferRoute
+  '/stor': typeof StorRoute
   '/tape': typeof TapeRoute
 }
 export interface FileRoutesByTo {
@@ -83,8 +97,10 @@ export interface FileRoutesByTo {
   '/desk': typeof DeskRoute
   '/hawkes': typeof HawkesRoute
   '/icebergs': typeof IcebergsRoute
+  '/killswitch': typeof KillswitchRoute
   '/leadlag': typeof LeadlagRoute
   '/sniffer': typeof SnifferRoute
+  '/stor': typeof StorRoute
   '/tape': typeof TapeRoute
 }
 export interface FileRoutesById {
@@ -95,8 +111,10 @@ export interface FileRoutesById {
   '/desk': typeof DeskRoute
   '/hawkes': typeof HawkesRoute
   '/icebergs': typeof IcebergsRoute
+  '/killswitch': typeof KillswitchRoute
   '/leadlag': typeof LeadlagRoute
   '/sniffer': typeof SnifferRoute
+  '/stor': typeof StorRoute
   '/tape': typeof TapeRoute
 }
 export interface FileRouteTypes {
@@ -108,8 +126,10 @@ export interface FileRouteTypes {
     | '/desk'
     | '/hawkes'
     | '/icebergs'
+    | '/killswitch'
     | '/leadlag'
     | '/sniffer'
+    | '/stor'
     | '/tape'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -119,8 +139,10 @@ export interface FileRouteTypes {
     | '/desk'
     | '/hawkes'
     | '/icebergs'
+    | '/killswitch'
     | '/leadlag'
     | '/sniffer'
+    | '/stor'
     | '/tape'
   id:
     | '__root__'
@@ -130,8 +152,10 @@ export interface FileRouteTypes {
     | '/desk'
     | '/hawkes'
     | '/icebergs'
+    | '/killswitch'
     | '/leadlag'
     | '/sniffer'
+    | '/stor'
     | '/tape'
   fileRoutesById: FileRoutesById
 }
@@ -142,8 +166,10 @@ export interface RootRouteChildren {
   DeskRoute: typeof DeskRoute
   HawkesRoute: typeof HawkesRoute
   IcebergsRoute: typeof IcebergsRoute
+  KillswitchRoute: typeof KillswitchRoute
   LeadlagRoute: typeof LeadlagRoute
   SnifferRoute: typeof SnifferRoute
+  StorRoute: typeof StorRoute
   TapeRoute: typeof TapeRoute
 }
 
@@ -191,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IcebergsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/killswitch': {
+      id: '/killswitch'
+      path: '/killswitch'
+      fullPath: '/killswitch'
+      preLoaderRoute: typeof KillswitchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/leadlag': {
       id: '/leadlag'
       path: '/leadlag'
@@ -203,6 +236,13 @@ declare module '@tanstack/react-router' {
       path: '/sniffer'
       fullPath: '/sniffer'
       preLoaderRoute: typeof SnifferRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stor': {
+      id: '/stor'
+      path: '/stor'
+      fullPath: '/stor'
+      preLoaderRoute: typeof StorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tape': {
@@ -222,8 +262,10 @@ const rootRouteChildren: RootRouteChildren = {
   DeskRoute: DeskRoute,
   HawkesRoute: HawkesRoute,
   IcebergsRoute: IcebergsRoute,
+  KillswitchRoute: KillswitchRoute,
   LeadlagRoute: LeadlagRoute,
   SnifferRoute: SnifferRoute,
+  StorRoute: StorRoute,
   TapeRoute: TapeRoute,
 }
 export const routeTree = rootRouteImport

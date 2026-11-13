@@ -23,3 +23,17 @@ export function checkOrder(o: TestOrder, m: Market, recent: number[], L: KillLim
   if (inMin >= L.maxOrdersPerMin) return { ok: false, rule: "Message throttle (RTS 6 Art 15)", detail: `${inMin} orders/min` };
   return { ok: true };
 }
+
+/** Mango Markets (Oct 2022) style oracle-manipulation case study: oracle mark diverges from deep spot reference. */
+export interface MangoStep { label: string; oracle: number; spot: number }
+export const MANGO_SCENARIO: MangoStep[] = [
+  { label: "Normal market", oracle: 0.038, spot: 0.038 },
+  { label: "Attacker buys thin perp/spot", oracle: 0.06, spot: 0.039 },
+  { label: "Oracle pumped", oracle: 0.54, spot: 0.041 },
+  { label: "Borrow against inflated collateral", oracle: 0.91, spot: 0.042 },
+];
+/** RTS 6-style collar on oracle vs spot divergence; returns halt reason or null. */
+export function oracleCollar(step: MangoStep, collarPct = 3.5): string | null {
+  const dev = (Math.abs(step.oracle - step.spot) / step.spot) * 100;
+  return dev > collarPct ? `Oracle deviates ${dev.toFixed(1)}% from spot (> ${collarPct}%) — halt` : null;
+}

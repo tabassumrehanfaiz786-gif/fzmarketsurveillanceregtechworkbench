@@ -1,3 +1,5 @@
+import { useSurveillance } from "@/hooks/use-surveillance";
+import { IncidentRegistry } from "@/components/terminal/incident-registry";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Brain, Volume2, VolumeX } from "lucide-react";
@@ -19,10 +21,10 @@ import { LiquidityHeatmap } from "@/components/terminal/liquidity-heatmap";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "FZ Quant Terminal — BTCUSDT Paper Trading" },
-      { name: "description", content: "Live BTCUSDT emerald order book liquidity heatmap, large passive order walls, and automated paper trading with Binance market data." },
-      { property: "og:title", content: "FZ Quant Terminal — BTCUSDT Paper Trading" },
-      { property: "og:description", content: "Live emerald Binance liquidity heatmap with red resting order walls, BTC price, and paper trading analytics." },
+      { title: "FZ Market Surveillance & RegTech Workbench" },
+      { name: "description", content: "Algorithmic integrity monitor: live market-abuse incident registry, FCA STOR drafts and MiFID II RTS 6 kill-switch testing on public BTC data." },
+      { property: "og:title", content: "FZ Market Surveillance & RegTech Workbench" },
+      { property: "og:description", content: "Research workbench mapping live market microstructure to UK MAR and MiFID II surveillance duties." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -57,6 +59,7 @@ function Terminal() {
   const { candles, engines, feed, error, historyReady, retry } = useTerminal(interval);
   const e = engines[mode];
   useTradeAlerts(e, muted, historyReady);
+  const surv = useSurveillance();
   const sync = useTradeSync(engines, interval, user?.id ?? null);
   const price = candles[candles.length - 1]?.close ?? 0;
   const st = stats(e);
@@ -68,7 +71,7 @@ function Terminal() {
   return (
     <div className="flex min-h-screen flex-col gap-2 bg-background p-2 font-mono text-xs text-foreground lg:h-screen lg:min-h-[920px]">
       <header className="flex flex-wrap items-center gap-x-6 gap-y-2 border border-border bg-card px-3 py-2">
-        <div className="font-display text-base font-semibold">FZ<span className="text-primary">/</span>Quant Terminal</div>
+        <div className="font-display text-base font-semibold">FZ<span className="text-primary">/</span>Market Surveillance &amp; RegTech Workbench</div>
         <div className="flex items-center gap-2">
           <span className={cn("h-2 w-2 rounded-full", feed === "live" ? "bg-up animate-pulse" : feed === "down" ? "bg-down" : "bg-primary")} />
           <span className="text-muted-foreground">BINANCE · BTCUSDT · {feed.toUpperCase()}</span>
@@ -79,14 +82,18 @@ function Terminal() {
           <Seg value={interval} onChange={(v) => setInterval(v as Interval)} options={[["1m", "1m"], ["5m", "5m"], ["15m", "15m"]]} />
           <Seg value={mode} onChange={(v) => setMode(v as Mode)} options={[["sweep", "Institutional Sweep & Reclaim"], ["touch", "Basic 10k Touch"], ["hawkes", "Hawkes 10k"]]} />
           <Button size="icon" variant="ghost" className="h-7 w-7" aria-label={muted ? "Enable trade sounds" : "Mute trade sounds"} title={muted ? "Enable trade sounds" : "Mute trade sounds"} onClick={() => { const next = !muted; setMuted(next); saveAlertsMuted(next); if (!next) playChime("entry"); }}>{muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}</Button>
-          <Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/tape">Tape</Link></Button>
+          <Button asChild size="sm" className="h-7 text-[11px]"><Link to="/compliance">Regulation</Link></Button><Button asChild size="sm" className="h-7 text-[11px]"><Link to="/stor">STOR</Link></Button><Button asChild size="sm" className="h-7 text-[11px]"><Link to="/killswitch">Kill Switch</Link></Button><Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/tape">Tape</Link></Button>
           <Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/icebergs">Icebergs</Link></Button>
-          <Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/bookmap">Bookmap</Link></Button><Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/desk">OTC Desk</Link></Button><Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/leadlag">Lead-Lag</Link></Button><Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/sniffer">Sniffer</Link></Button><Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/hawkes">Hawkes</Link></Button><Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/compliance">Regulation</Link></Button>
+          <Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/bookmap">Bookmap</Link></Button><Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/desk">OTC Desk</Link></Button><Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/leadlag">Lead-Lag</Link></Button><Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/sniffer">Sniffer</Link></Button><Button asChild size="sm" variant="outline" className="h-7 text-[11px]"><Link to="/hawkes">Hawkes</Link></Button>
           <Button size="sm" variant="outline" className="h-7 gap-1.5 text-[11px]" onClick={() => { setWorkspace("coach"); document.getElementById("coach-workspace")?.scrollIntoView({ behavior: "smooth", block: "center" }); }}><Brain className="h-3.5 w-3.5" />AI Coach</Button>
           <AccountControls user={user} />
         </div>
       </header>
 
+      <IncidentRegistry log={surv.log} />
+      <HawkesRadar />
+      <VpinGauge />
+      <p className="px-1 text-[11px] text-muted-foreground">SIMULATED ALGORITHMIC STRESS-TEST EXECUTION · paper only, no real orders</p>
       <section aria-label="Current paper trade" className={cn("border border-border bg-card px-3 py-2", p && "border-up/50")}>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="text-[11px] text-muted-foreground">PAPER · {interval} · {MODE_LABEL[mode]}{mode === "hawkes" && ` · n ${e.branching.toFixed(2)}`}</span>
@@ -101,8 +108,6 @@ function Terminal() {
         {!error && feed === "down" && <div className="mt-2 flex items-center justify-between gap-2 text-down"><span>Live feed disconnected · values may be stale.</span><Button variant="outline" size="sm" onClick={retry}>Reconnect</Button></div>}
       </section>
 
-      <HawkesRadar />
-      <VpinGauge />
 
       <div className="grid grid-cols-3 gap-1 sm:gap-2 lg:grid-cols-6">
         <Stat label="Equity" value={usd(equity)} />

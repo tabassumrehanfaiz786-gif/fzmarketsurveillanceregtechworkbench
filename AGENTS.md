@@ -22,3 +22,4 @@
 - Hidden-order sniffer (/sniffer) uses pure src/lib/sniffer.ts on live public prints; results are estimates and never touch strategy decisions.
 - Hawkes cascade radar (/): pure src/lib/hawkes.ts estimates branching ratio from live Coinbase prints; display-only, never touches strategy decisions.
 - VPIN gauge uses pure src/lib/vpin.ts on live Coinbase prints (display-only); strategy entries pay pure entrySlippage (half spread + ATR·(n−0.4)⁺·impact) recorded on trades.
+- Market-abuse incident registry (pure src/lib/incidents.ts) and /stor, /killswitch benches are display/test only: they draft reports and simulate controls but never file STORs, send orders, or change strategy decisions.

@@ -15,7 +15,7 @@
 - [ ] Verify saving trades and reading back a personalized report while signed in — blocked until the first account signs up.
 
 # Dual live Bookmap
-- [ ] Build synchronized Spot/Perpetual depth, executions, CVD, and liquidations with bounded histories.
+- [x] Build synchronized Spot/Perpetual depth, executions, CVD, and liquidations with bounded histories.
 - [ ] Match the reference layout and macro price range with honest depth coverage indicators.
 - [ ] Test market calculations and verify live desktop/mobile controls.
 
