@@ -40,7 +40,7 @@ function KillPage() {
     if (v.ok) { setAccepted((a) => [...a, t]); add(`ACCEPT · ${qty} BTC @ ${dev}% from ref`, true); }
     else add(`REJECT · ${v.rule} · ${v.detail}`, false);
   };
-  const ms = MANGO_SCENARIO[step]; const halt = oracleCollar(ms);
+  const ms = MANGO_SCENARIO[step] ?? MANGO_SCENARIO[0]!; const halt = oracleCollar(ms);
   return (
     <main className="min-h-screen bg-background p-4 font-mono text-foreground">
       <div className="mx-auto max-w-5xl space-y-4">
