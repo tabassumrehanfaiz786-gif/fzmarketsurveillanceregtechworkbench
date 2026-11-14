@@ -1,5 +1,7 @@
 {
-  "name": "tanstack_start_ts",
+  "name": "fz-market-surveillance-regtech-workbench",
+  "author": "Faizan Rehan",
+  "license": "SEE LICENSE IN LICENSE",
   "private": true,
   "sideEffects": false,
   "type": "module",

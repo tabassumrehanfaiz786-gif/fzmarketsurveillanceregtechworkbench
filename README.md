@@ -1,4 +1,6 @@
- # FZ Market Surveillance & RegTech Workbench
+ <p align="center"><img src="src/assets/fz-logo.png" width="140" alt="FZ logo"/></p>
+
+# FZ Market Surveillance & RegTech Workbench
 ### *Autonomous Algorithmic Integrity, Microstructure Abuse Detection & Statutory STOR Audit System*
 
 [![Live Research Deployment](https://img.shields.io/badge/Live%20Platform-Active-success.svg?style=flat-square)](https://fzmarketsurveillanceregtechworkbench.lovable.app)
@@ -6,7 +8,7 @@
 [![SSRN Papers](https://img.shields.io/badge/SSRN-5%20Working%20Papers-1e3a8a.svg?style=flat-square)](https://papers.ssrn.com)
 [![Statutory Framework](https://img.shields.io/badge/Statutory%20Mapping-UK%20MAR%20%7C%20MiFID%20II%20RTS%206-orange.svg?style=flat-square)](https://www.handbook.fca.org.uk)
 [![Test Suite](https://img.shields.io/badge/Unit%20Tests-85%2F85%20Passing-brightgreen.svg?style=flat-square)](./src)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![License](https://img.shields.io/badge/License-%C2%A9%20Faizan%20Rehan-yellow.svg?style=flat-square)](./LICENSE)
 
 ---
 
@@ -130,3 +132,15 @@ npm test
 
 # Launch the live research environment
 npm run dev
+
+
+---
+
+## Author, Ownership & License
+
+* **Author / Owner:** Faizan Rehan
+* **ORCID iD:** add your ORCID (https://orcid.org/0009-0008-XXXX-XXXX)
+* **SSRN Author Page:** add your SSRN author link
+* **Live:** https://fzmarketsurveillanceregtechworkbench.lovable.app
+* **Repository:** fz-market-surveillance-regtech-workbench
+* **License:** Copyright (c) 2026 Faizan Rehan. All rights reserved. See [LICENSE](./LICENSE).
